@@ -1,0 +1,10 @@
+.DS_Store
+
+# Pinned Hammerspoon 2 source
+vendor/
+
+CLAUDE.md
+local*
+biome.json
+tsconfig.json
+Hammerspoon.d.ts
