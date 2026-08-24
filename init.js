@@ -58,7 +58,7 @@ const opt = ["option"];
 
 // utils
 bind(ctrl, "space", spotlight);
-bindDoubleTap("cmd", showMetaChooser);
+bindDoubleTap(cmd, showMetaChooser);
 bind(cmd, "space", keyboardLayout);
 bind(opt, "f1", spotlightClipboard);
 bind(opt, "f3", spotlightActions);

@@ -26,6 +26,7 @@ function attachChooserKeys(chooser) {
   chooser.onHide = () => {
     visibleChooser = null;
     for (const key of chooserHotkeys) key.disable();
+    chooser.setChoices([]);
   };
 }
 

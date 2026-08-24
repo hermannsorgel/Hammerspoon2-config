@@ -15,15 +15,13 @@ function createMetaChooser(commands) {
   chooser.searchSubText = true;
   chooser.width = 0.4;
 
-  chooser.setChoices(
-    commands.map((command, index) => ({
-      text: command.name,
-      subText: command.keyword
-        ? `${command.description}  ·  ${command.keyword}`
-        : command.description,
-      index,
-    })),
-  );
+  const choices = commands.map((command, index) => ({
+    text: command.name,
+    subText: command.keyword
+      ? `${command.description}  ·  ${command.keyword}`
+      : command.description,
+    index,
+  }));
 
   chooser.onSelect = (choice) => {
     if (choice) commands[choice.index].run();
@@ -41,6 +39,7 @@ function createMetaChooser(commands) {
   };
 
   return () => {
+    chooser.setChoices(choices);
     chooser.query = "";
     chooser.show();
   };
