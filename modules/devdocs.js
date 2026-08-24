@@ -1,4 +1,4 @@
-// handles page zooming + change title to trigger GC
+// handles page zooming
 const devdocsPageScript = `
 (function () {
   if (window.hsDevdocs) return;
@@ -7,11 +7,6 @@ const devdocsPageScript = `
 
   document.addEventListener("keydown", function (e) {
     if (!e.metaKey) return;
-    if (e.key === "w") {
-      e.preventDefault();
-      document.title = "killmeplease";
-      return;
-    }
     if (e.key === "=") zoom += 0.1;
     else if (e.key === "-") zoom += -0.1;
     else if (e.key === "0") zoom = 1;
@@ -32,27 +27,7 @@ if (!document.cookie.includes("override-mobile-detect=false")) {
 }
 `;
 
-/** @type {HSUIWindow | null} */
-let devdocsWindow = null;
-
-/** @type {UIWebView | null} */
-let devdocsWebview = null;
-
-function releaseDevdocs() {
-  if (!devdocsWindow && !devdocsWebview) return;
-
-  devdocsWindow?.close();
-
-  // frees ghost windows, see withCheckedContinuation, UIWebView.swift:743
-  devdocsWebview?.loadURL("about:blank");
-
-  devdocsWindow = null;
-  devdocsWebview = null;
-}
-
 function createDevdocs() {
-  releaseDevdocs();
-
   const screen = hs.screen.main()?.frame;
   const primaryHeight = hs.screen.primary()?.fullFrame.h;
   if (!screen || primaryHeight === undefined) return;
@@ -60,10 +35,7 @@ function createDevdocs() {
   const wv = hs.ui
     .webview()
     .loadURL("https://devdocs.io")
-    .onLoadChange(() => wv.execJS(devdocsDesktopScript + devdocsPageScript))
-    .onTitleChange((title) => {
-      if (title === "killmeplease") releaseDevdocs();
-    });
+    .onLoadChange(() => wv.execJS(devdocsDesktopScript + devdocsPageScript));
 
   const width = 700;
   const height = 768;
@@ -76,10 +48,13 @@ function createDevdocs() {
       w: width,
       h: height,
     })
-    .webview(wv);
+    .webview(wv)
+    .onHide(() => {
+      win.destroy();
 
-  devdocsWindow = win;
-  devdocsWebview = wv;
+      // frees ghost windows, see withCheckedContinuation, UIWebView.swift:743
+      wv.loadURL("about:blank");
+    });
 
   hs.application.launchOrFocus("net.tenshu.Hammerspoon-2");
   win.show();
